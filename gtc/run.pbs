@@ -1,0 +1,19 @@
+#!/bin/bash
+#    Begin PBS directives
+#PBS -A csc218
+#PBS -N gatech_gtc
+#PBS -j oe
+#PBS -l walltime=00:04:00,nodes=64
+#    End PBS directives and begin shell commands
+cd $MEMBERWORK/csc218/titan/gtc
+date
+# we assign core-15 for system services to reduce jitter. Place rank on each core.
+# N controls the number of ranks per each node. 
+# r1 sets all the system services on seperate core (15)
+aprun -n 256 -N 4 -r1 /ccs/proj/csc218/checkout/phoenix/bin/mpiformat  /tmp/scratch 2000
+#we need only one phx.lock file per node
+aprun -n 64 -N 1 -r1 touch  /tmp/scratch/phx.lock
+#clear stats directory
+rm -rf ./stats/slog_p*
+#aprun -n 64 -N 1 -r1 ls  /tmp/scratch
+aprun -n 256 -N 4 -r1 /ccs/proj/csc218/checkout/mygtc/source/gtcmpi 
